@@ -55,6 +55,7 @@ export const CitiesList = () => {
     city => setCitiesList(curCities => [...curCities, city]),
     []
   )
+
   return (
     <TableContainer component={Paper}>
       <Table aria-label="Cities">
