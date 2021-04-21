@@ -1,57 +1,14 @@
-import React, { useCallback, useState } from 'react'
-import { useQuery, gql } from '@apollo/client'
-import { Box, TableCell, TableRow } from '@material-ui/core'
+import React from 'react'
+import { gql } from '@apollo/client'
+import { Box, Button, TableCell, TableRow } from '@material-ui/core'
 import { CityType } from '../types'
 
-const GET_CITY_BY_ID = gql`
-  query GetCityById {
-    getCityById(id: $cityId) {
-      id
-      name
-      country
-      coord {
-        lon
-        lat
-      }
-      weather {
-        summary {
-          title
-          description
-          icon
-        }
-        temperature {
-          actual
-          feelsLike
-          min
-          max
-        }
-        wind {
-          speed
-          deg
-        }
-        clouds {
-          all
-          visibility
-          humidity
-        }
-        timestamp
-      }
-    }
-  }
-`
-
 type PropTypes = {
-  city: CityType,
+  city: CityType
+  onDeleteCity: (e: any) => void
 }
 
-export const City = ({ city }: PropTypes) => {
-  const { loading, error, data } = useQuery(GET_CITY_BY_ID, {
-    variables: { cityId: city.id },
-  })
-  console.log('kekus', data?.getCityByName)
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error :(</p>
-
+export const City = React.memo(({ city, onDeleteCity }: PropTypes) => {
   return (
     <TableRow>
       <TableCell component="th" scope="city">
@@ -77,6 +34,16 @@ export const City = ({ city }: PropTypes) => {
         <Box>{city.weather.wind.speed}</Box>
         <Box>{city.weather.wind.deg}</Box>
       </TableCell>
+      <TableCell align="right">
+        <Button
+          onClick={() => onDeleteCity(city.id)}
+          data-city-id={city.id}
+          variant="contained"
+          color="secondary"
+        >
+          Remove
+        </Button>
+      </TableCell>
     </TableRow>
   )
-}
+})
