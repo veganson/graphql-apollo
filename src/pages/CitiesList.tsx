@@ -15,6 +15,7 @@ import {
   TableRow,
   TextField,
 } from '@material-ui/core'
+import debounce from 'lodash.debounce'
 import { CityType } from '../types'
 
 const GET_CITY_BY_NAME = gql`
@@ -78,12 +79,21 @@ export const CitiesList = () => {
     )
   }, [])
 
-  const onSearchCity = useCallback(
-    () => searchCityByName({ variables: { cityName: searchInput } }),
-    [searchInput]
+  const triggerSearchByName = useCallback(
+    debounce(
+      (cityName: string) => searchCityByName({ variables: { cityName } }),
+      300
+    ),
+    []
   )
 
-  const onSearchChange = useCallback(e => setSearchInput(e.target.value), [])
+  const onSearchChange = useCallback(e => {
+    setSearchInput(e.target.value)
+
+    if (e.target.value.length > 2) {
+      triggerSearchByName(e.target.value)
+    }
+  }, [])
 
   return (
     <Container>
@@ -99,28 +109,25 @@ export const CitiesList = () => {
                 onChange={onSearchChange}
               />
             </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={isSearchByNameLoading}
-                onClick={onSearchCity}
-              >
-                {isSearchByNameLoading ? 'Loading...' : 'Search'}
-              </Button>
-            </Grid>
-            {!!searchInput && !!searchByNameResult?.getCityByName && (
+            {!!isSearchByNameLoading && (
               <Grid item xs={12}>
-                <Box mt={3}>
-                  {searchByNameResult.getCityByName.name}
-                  <Box ml={3} display="inline-block">
-                    <Button size="small" variant="outlined" onClick={addCity}>
-                      Add
-                    </Button>
-                  </Box>
-                </Box>
+                <Box mt={3}>Loading...</Box>
               </Grid>
             )}
+            {!isSearchByNameLoading &&
+              !!searchInput &&
+              !!searchByNameResult?.getCityByName && (
+                <Grid item xs={12}>
+                  <Box mt={3}>
+                    {searchByNameResult.getCityByName.name}
+                    <Box ml={3} display="inline-block">
+                      <Button size="small" variant="outlined" onClick={addCity}>
+                        Add
+                      </Button>
+                    </Box>
+                  </Box>
+                </Grid>
+              )}
           </Grid>
         </Box>
         <Table aria-label="Cities">
