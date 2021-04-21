@@ -4,6 +4,7 @@ import { City } from './City'
 import {
   Box,
   Button,
+  Container,
   Grid,
   Paper,
   Table,
@@ -85,57 +86,61 @@ export const CitiesList = () => {
   const onSearchChange = useCallback(e => setSearchInput(e.target.value), [])
 
   return (
-    <TableContainer component={Paper}>
-      <Grid container justify="center">
-        <Grid item>
-          <TextField
-            size="small"
-            variant="outlined"
-            value={searchInput}
-            placeholder="Search for a city"
-            onChange={onSearchChange}
-          />
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="primary"
-            disabled={isSearchByNameLoading}
-            onClick={onSearchCity}
-          >
-            {isSearchByNameLoading ? 'Loading...' : 'Search'}
-          </Button>
-        </Grid>
-        {!!searchInput && !!searchByNameResult?.getCityByName && (
-          <Grid item xs={12}>
-            <Box mt={3}>
-              {searchByNameResult.getCityByName.name}
-              <Box ml={3} display="inline-block">
-                <Button size="small" variant="outlined" onClick={addCity}>
-                  Add
-                </Button>
-              </Box>
-            </Box>
+    <Container>
+      <TableContainer component={Paper}>
+        <Box mt={3}>
+          <Grid container justify="center">
+            <Grid item>
+              <TextField
+                size="small"
+                variant="outlined"
+                value={searchInput}
+                placeholder="Search for a city"
+                onChange={onSearchChange}
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={isSearchByNameLoading}
+                onClick={onSearchCity}
+              >
+                {isSearchByNameLoading ? 'Loading...' : 'Search'}
+              </Button>
+            </Grid>
+            {!!searchInput && !!searchByNameResult?.getCityByName && (
+              <Grid item xs={12}>
+                <Box mt={3}>
+                  {searchByNameResult.getCityByName.name}
+                  <Box ml={3} display="inline-block">
+                    <Button size="small" variant="outlined" onClick={addCity}>
+                      Add
+                    </Button>
+                  </Box>
+                </Box>
+              </Grid>
+            )}
           </Grid>
-        )}
-      </Grid>
-      <Table aria-label="Cities">
-        <TableHead>
-          <TableRow>
-            <TableCell>City</TableCell>
-            <TableCell align="right">Weather</TableCell>
-            <TableCell align="right">Temperature</TableCell>
-            <TableCell align="right">Clouds</TableCell>
-            <TableCell align="right">Wind</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {citiesList.map(city => (
-            <City city={city} key={city.id} onDeleteCity={onDeleteCity} />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+        </Box>
+        <Table aria-label="Cities">
+          <TableHead>
+            <TableRow>
+              <TableCell>City</TableCell>
+              <TableCell align="left">Weather</TableCell>
+              <TableCell align="left">Temperature</TableCell>
+              <TableCell align="left">Clouds</TableCell>
+              <TableCell align="left">Wind</TableCell>
+              <TableCell align="center"></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {citiesList.map(city => (
+              <City city={city} key={city.id} onDeleteCity={onDeleteCity} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   )
 }
