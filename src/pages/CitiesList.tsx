@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { gql, useLazyQuery } from '@apollo/client'
 import { City } from './City'
 import {
@@ -16,7 +16,10 @@ import {
   TextField,
 } from '@material-ui/core'
 import debounce from 'lodash.debounce'
-import { CityType } from '../types'
+import { CityType, UserGeolocationType } from '../types'
+import { useUserGeolocation } from '../hooks/useUserGeolocation'
+
+const DEFAULT_CITY = 'Minsk'
 
 const GET_CITY_BY_NAME = gql`
   query GetCityByName($cityName: String!) {
@@ -61,9 +64,38 @@ export const CitiesList = () => {
     { loading: isSearchByNameLoading, data: searchByNameResult },
   ] = useLazyQuery(GET_CITY_BY_NAME)
 
-  const [citiesList, setCitiesList] = useState<CityType[]>([])
+  const [
+    searchDefaultCity,
+    { loading: isDefaultCitySearchLoading, data: defaultCitySearchResult },
+  ] = useLazyQuery(GET_CITY_BY_NAME)
 
+  const [citiesList, setCitiesList] = useState<CityType[]>([])
+  const {
+    error: locationError,
+    isLoading: isCurrentLocationLoading,
+    city: currentLocationCity,
+  } = useUserGeolocation()
   const [searchInput, setSearchInput] = useState<string>('')
+
+  useEffect(() => {
+    if (!isCurrentLocationLoading) {
+      searchDefaultCity({
+        variables: {
+          cityName: currentLocationCity || DEFAULT_CITY,
+        },
+      })
+    }
+  }, [isCurrentLocationLoading, currentLocationCity])
+
+  // when default city is fetched, add it to the cities list
+  useEffect(() => {
+    if (defaultCitySearchResult?.getCityByName) {
+      setCitiesList(curCities => [
+        defaultCitySearchResult?.getCityByName,
+        ...curCities,
+      ])
+    }
+  }, [!!defaultCitySearchResult?.getCityByName])
 
   const addCity = useCallback(() => {
     setCitiesList(currentCities => [
@@ -84,7 +116,7 @@ export const CitiesList = () => {
       (cityName: string) => searchCityByName({ variables: { cityName } }),
       300
     ),
-    []
+    [searchCityByName]
   )
 
   const onSearchChange = useCallback(e => {

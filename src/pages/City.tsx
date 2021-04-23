@@ -1,5 +1,4 @@
 import React from 'react'
-import { gql } from '@apollo/client'
 import { Box, Button, TableCell, TableRow } from '@material-ui/core'
 import { CityType } from '../types'
 

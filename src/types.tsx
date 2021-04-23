@@ -32,3 +32,13 @@ export type CityType = {
   name: string
   weather: WeatherType
 }
+
+export type UserGeolocationType = {
+  coords?: {
+    latitude: number | null
+    longitude: number | null
+  } | null
+  city?: string | null
+  error?: string | null
+  isLoading: boolean
+}
